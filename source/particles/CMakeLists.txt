@@ -1,2 +1,1 @@
-add_library(particle_interface_lib INTERFACE i_particle_2D_in_a_box.h)
-add_library(particle_lib STATIC particle_2D_in_a_box.h)
+add_library(particle_interface_lib INTERFACE i_particle_2D_in_a_box.h particle_2D_in_a_box.h)
