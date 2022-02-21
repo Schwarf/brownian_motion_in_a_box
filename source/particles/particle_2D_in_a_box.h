@@ -14,13 +14,13 @@ class Particle2DInABox: public IParticle2DInABox<T>
 public:
 	Particle2DInABox()
 		:
-		id_{particle_counter_++}
+		id_{Particle2DInABox<T>::particle_counter_++}
 	{
 
 	}
 	T radius() const final
 	{
-		return nullptr;
+		return radius_;
 	}
 
 	void move(T time_delta) final
@@ -28,15 +28,15 @@ public:
 
 	}
 
-	T time_to_hit(IParticle2DInABox<T> &other_particle) final
+	T time_to_hit(const IParticle2DInABox<T> &other_particle) const final
 	{
 		if (this->id() == other_particle.id())
 			return T{-1};
-		auto delta_x = this->x_position_ - other_particle.x_position();
-		auto delta_y = this->y_position_ - other_particle.y_position();
 
-		auto delta_v_x = this->x_velocity_ - other_particle.x_velocity();
-		auto delta_v_y = this->y_velocity_ - other_particle.y_velocity();
+		auto delta_x = delta_x_(other_particle);
+		auto delta_y = delta_y_(other_particle);
+		auto delta_v_x = delta_v_x_(other_particle);
+		auto delta_v_y = delta_v_y_(other_particle);
 
 		auto delta_position_times_delta_velocity = delta_x * delta_v_x + delta_y * delta_v_y;
 		if (delta_position_times_delta_velocity > T{})
@@ -44,26 +44,28 @@ public:
 
 		auto velocity_delta_squared = delta_v_x * delta_v_x + delta_v_y * delta_v_y;
 		auto position_delta_squared = delta_x * delta_x + delta_y * delta_y;
-		auto radi_distance = this->radius_ + other_particle.radius();
+		auto radii_distance = this->radius_ + other_particle.radius();
 
-		auto delta = (delta_position_times_delta_velocity * delta_position_times_delta_velocity) - velocity_delta_squared
-			*(position_delta_squared - radi_distance *radi_distance);
-		if(delta < 0)
+		auto
+			delta = (delta_position_times_delta_velocity * delta_position_times_delta_velocity) - velocity_delta_squared
+			* (position_delta_squared - radii_distance * radii_distance);
+		if (delta < 0)
 			return T{-1};
-		return -(delta_position_times_delta_velocity + std::sqrt(delta))/velocity_delta_squared;
-
+		return -(delta_position_times_delta_velocity + std::sqrt(delta)) / velocity_delta_squared;
 
 	}
-	T time_to_hit_vertical_wall() final
+	T time_to_hit_vertical_wall() const final
 	{
-		return nullptr;
+		return T{};
 	}
-	T time_to_hit_horizontal_wall() final
+	T time_to_hit_horizontal_wall() const final
 	{
-		return nullptr;
+		return T{};
 	}
 	void scatter(IParticle2DInABox<T> &other_particle) final
 	{
+		auto delta_x = delta_x_(other_particle);
+		auto delta_y = delta_y_(other_particle);
 
 	}
 	void scatter_vertical_wall() final
@@ -92,9 +94,27 @@ public:
 	}
 	size_t id() const
 	{
-		return nullptr;
+		return id_;
 	}
 private:
+	T delta_x_(const IParticle2DInABox<T> &other_particle) const
+	{
+		return other_particle.x_position() - this->x_position_;
+	}
+	T delta_y_(const IParticle2DInABox<T> &other_particle) const
+	{
+		return other_particle.y_position() - this->y_position_;
+	}
+
+	T delta_v_x_(const IParticle2DInABox<T> &other_particle) const
+	{
+		return other_particle.x_velocity() - this->x_velocity_;
+	}
+	T delta_v_y_(const IParticle2DInABox<T> &other_particle) const
+	{
+		return other_particle.y_velocity() - this->y_velocity_;
+	}
+
 	size_t id_{};
 	static size_t particle_counter_;
 	T x_position_{};
@@ -102,8 +122,11 @@ private:
 	T x_velocity_{};
 	T y_velocity_{};
 	T radius_{};
-	
+
 };
 
+// Initialize particle counter.
+template<typename T>
+size_t Particle2DInABox<T>::particle_counter_ = 0;
 
 #endif //PARTICLE_2D_IN_A_BOX_H
