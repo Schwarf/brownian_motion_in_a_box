@@ -44,7 +44,7 @@ public:
 		y_position_ += y_velocity_ * time_delta;
 	}
 
-	T time_to_hit(const IParticle2DInABox<T> &other_particle) const final
+	T time_to_scatter(IParticle2DInABox<T> &other_particle) const final
 	{
 		if (this->id() == other_particle.id())
 			return T{-1};
@@ -70,7 +70,7 @@ public:
 		return -(delta_position_times_delta_velocity + std::sqrt(delta)) / velocity_delta_squared;
 
 	}
-	T time_to_hit_vertical_wall() const final
+	T time_to_scatter_vertical_wall() const final
 	{
 		// we are in a box of size 1x1 with left lower origin at (0,0)
 		if (x_velocity_ > 0) {
@@ -82,7 +82,7 @@ public:
 
 		return T{-1};
 	}
-	T time_to_hit_horizontal_wall() const final
+	T time_to_scatter_horizontal_wall() const final
 	{
 		// we are in a box of size 1x1 with left lower origin at (0,0)
 		if (y_velocity_ > 0) {

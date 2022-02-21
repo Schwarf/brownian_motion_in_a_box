@@ -10,9 +10,9 @@ class IParticle2DInABox
 {
 public:
 	virtual void move(T time_delta) = 0;
-	virtual T time_to_hit(const IParticle2DInABox &other_particle) const = 0;
-	virtual T time_to_hit_vertical_wall() const = 0;
-	virtual T time_to_hit_horizontal_wall() const = 0;
+	virtual T time_to_scatter(IParticle2DInABox &other_particle) const = 0;
+	virtual T time_to_scatter_vertical_wall() const = 0;
+	virtual T time_to_scatter_horizontal_wall() const = 0;
 	virtual void scatter(IParticle2DInABox &other_particle) = 0;
 	virtual void scatter_vertical_wall() = 0;
 	virtual void scatter_horizontal_wall() = 0;
