@@ -12,6 +12,8 @@ template<class T>
 class CollisionEvent: public ICollisionEvent<T>
 {
 public:
+	CollisionEvent() = default;
+
 	CollisionEvent(T time_of_event, IParticle2DInABox<T> &particle_one, IParticle2DInABox<T> &particle_two)
 		:
 		time_of_event_(time_of_event),
@@ -33,14 +35,14 @@ public:
 	{
 		return time_of_event_ < other_event.time();
 	}
-	T time() const final	
+	T time() const final
 	{
 		return time_of_event_;
 	}
 
 private:
-	std::shared_ptr<IParticle2DInABox<T>> particle_one_;
-	std::shared_ptr<IParticle2DInABox<T>> particle_two_;
+	std::shared_ptr<IParticle2DInABox<T>> particle_one_{};
+	std::shared_ptr<IParticle2DInABox<T>> particle_two_{};
 	T time_of_event_;
 	size_t collision_count_particle_one_{};
 	size_t collision_count_particle_two_{};
