@@ -22,10 +22,39 @@ public:
 	}
 	void simulate_up_to_time(T time) final
 	{
-		for (size_t current_particle_index = 0; current_particle_index < list_of_particles_.size();
-			 ++current_particle_index) {
-			predict_scatter_times_for_(list_of_particles_[current_particle_index], current_particle_index);
+		for (auto & particle : list_of_particles_) {
+			predict_scatter_times_for_(particle);
 		}
+
+		priority_queue_.insert( ScatterEvent<T>(simulation_time_limit_, nullptr, nullptr));
+
+		while(!priority_queue_.is_empty())
+		{
+			auto event = priority_queue_.pop_minimum();
+			if(!event.is_still_valid())
+				continue;
+			auto particle_one = event.particle_one();
+			auto particle_two = event.particle_two();
+
+			auto time_of_event = event.time();
+			for(auto & particle : list_of_particles_)
+			{
+				particle->move(time_of_event - simulation_time_);
+			}
+			simulation_time_ = time_of_event;
+
+			if(particle_one && particle_two)
+				particle_one->scatter(particle_two);
+			if(particle_one && !particle_two)
+				particle_one->scatter_vertical_wall();
+			if(!particle_one && particle_two)
+				particle_two->scatter_horizontal_wall();
+			if(!particle_one && !particle_two)
+				continue;
+			predict_scatter_times_for_(particle_one);
+			predict_scatter_times_for_(particle_two);
+		}
+
 	}
 	std::vector<std::shared_ptr<IParticle2DInABox<T>>> particles()
 	{
@@ -37,11 +66,12 @@ public:
 		return priority_queue_;
 	}
 private:
-	void predict_scatter_times_for_(std::shared_ptr<IParticle2DInABox<T>> &current_particle,
-									size_t current_particle_index)
+	void predict_scatter_times_for_(std::shared_ptr<IParticle2DInABox<T>>  current_particle)
 	{
+	if(! current_particle)
+			return;
 		// check for current_particle-current_particle-scattering
-		for (size_t particle_index = current_particle_index + 1; particle_index < list_of_particles_.size();
+		for (size_t particle_index = current_particle->id() + 1; particle_index < list_of_particles_.size();
 			 particle_index++) {
 			auto scatter_time = current_particle->time_to_scatter(list_of_particles_[particle_index]);
 			if (scatter_time < 0.0) {
@@ -58,12 +88,12 @@ private:
 		auto horizontal_wall_scatter_time = current_particle->time_to_scatter_horizontal_wall();
 		if (vertical_wall_scatter_time > 0.0 && (vertical_wall_scatter_time + simulation_time_) < simulation_time_limit_) {
 			auto scatter_event =
-				ScatterEvent<T>(vertical_wall_scatter_time + simulation_time_, current_particle, current_particle);
+				ScatterEvent<T>(vertical_wall_scatter_time + simulation_time_, nullptr, current_particle);
 			priority_queue_.insert(scatter_event);
 		}
 		if (horizontal_wall_scatter_time > 0.0 && (horizontal_wall_scatter_time + simulation_time_) < simulation_time_limit_) {
 			auto scatter_event =
-				ScatterEvent<T>(horizontal_wall_scatter_time + simulation_time_, current_particle, current_particle);
+				ScatterEvent<T>(horizontal_wall_scatter_time + simulation_time_, current_particle, nullptr);
 			priority_queue_.insert(scatter_event);
 		}
 

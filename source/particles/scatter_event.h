@@ -4,7 +4,6 @@
 
 #ifndef SCATTER_EVENT_H
 #define SCATTER_EVENT_H
-#include <memory>
 #include "i_scatter_event.h"
 #include "i_particle_2D_in_a_box.h"
 
@@ -15,8 +14,8 @@ public:
 	ScatterEvent() = default;
 
 	ScatterEvent(T time_of_event,
-				 std::shared_ptr<IParticle2DInABox<T>> &particle_one,
-				 std::shared_ptr<IParticle2DInABox<T>> &particle_two)
+				 std::shared_ptr<IParticle2DInABox<T>> particle_one,
+				 std::shared_ptr<IParticle2DInABox<T>> particle_two)
 		:
 		time_of_event_(time_of_event),
 		particle_one_(particle_one),
@@ -42,6 +41,14 @@ public:
 	T time() const final
 	{
 		return time_of_event_;
+	}
+	std::shared_ptr<IParticle2DInABox<T>> particle_one() const override
+	{
+		return particle_one_;
+	}
+	std::shared_ptr<IParticle2DInABox<T>> particle_two() const override
+	{
+		return particle_two_;
 	}
 
 private:

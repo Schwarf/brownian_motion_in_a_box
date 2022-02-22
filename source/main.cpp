@@ -13,13 +13,14 @@ int main()
 	{
 		list_of_particles.push_back(std::make_shared<Particle2DInABox<double>>());
 	}
-	SystemSimulation<double, number_of_particles> simu(list_of_particles, 10000);
+	SystemSimulation<double, number_of_particles> simu(list_of_particles, 100);
 //	std::cout << "Hello, World!" << particle.id() << std::endl;
 //	std::cout << "Hello, World!" << particle1.id() << std::endl;
 	std::cout << "Hello, World!" << simu.particles()[0]->id() << std::endl;
 	std::cout << "Hello, World!" << simu.particles()[1]->id() << std::endl;
 //	std::cout << particle.time_to_scatter(particle1) << std:: endl;
 	simu.simulate_up_to_time(10000);
+
 	auto x = simu.queue();
 	return 0;
 }
