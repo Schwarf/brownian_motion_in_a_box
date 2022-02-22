@@ -34,7 +34,7 @@ public:
 		promote(index); // promote the value to the correct position in heap
 	}
 
-	T pop_maximum() final
+	T pop_minimum() final
 	{
 		size_t index_for_maximum = 0;
 		auto value = elements_[index_for_maximum];
@@ -45,7 +45,7 @@ public:
 		return value;
 	}
 
-	T get_maximum() const final
+	T get_minimum() const final
 	{
 		return elements_[0];
 	}
@@ -117,11 +117,12 @@ private:
 			auto new_index = 2*element_index + 1;
 			if (elements_[new_index+1].time() <  elements_[new_index].time())
 				new_index++;
-
 			if(elements_[new_index].time() < elements_[element_index].time() ){
 				swap(new_index, element_index);
 				element_index = new_index;
 			}
+			else
+				break;
 		}
 	}
 };

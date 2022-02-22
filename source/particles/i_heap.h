@@ -8,8 +8,8 @@ template<typename T>
 class IHeap
 {
 public:
-	virtual T pop_maximum() = 0;
-	virtual T get_maximum() const = 0;
+	virtual T pop_minimum() = 0;
+	virtual T get_minimum() const = 0;
 	virtual void insert(const T &value) = 0;
 	virtual size_t size() const = 0;
 	virtual bool is_empty() const = 0;
