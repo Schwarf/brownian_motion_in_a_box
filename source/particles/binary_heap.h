@@ -17,22 +17,18 @@ class BinaryHeap: IHeap<T>
 public:
 	BinaryHeap()
 	{
-		// index 0 will be ignored/not used
 		elements_ = new T[heap_capacity];
-		//		for(size_t index = 0; index < heap_size_; ++index)
-//		{
-//			elements_[index] = T{};
-//		}
 	}
 
 	~BinaryHeap()
 	{
-		delete[] elements_;
 	}
 
 	void insert(const T &value) final
 	{
 		heap_size_++;
+		if(heap_size_ > heap_capacity)
+			throw std::out_of_range("Heap size exceeds heap_capacity!");
 		auto index = heap_size_ - 1;
 		elements_[index] = value; // add value at the end and increase size
 		promote(index); // promote the value to the correct position in heap
@@ -86,7 +82,6 @@ public:
 
 	}
 private:
-//	T elements_[heap_capacity] ;
 	T * elements_;
 	size_t heap_size_{};
 
@@ -104,7 +99,7 @@ private:
 
 	void promote(size_t element_index)
 	{
-		while (element_index != 0 &&  elements_[parent_index(element_index)].time() < elements_[element_index].time()) {
+		while (element_index != 0 &&  elements_[parent_index(element_index)].time() > elements_[element_index].time()) {
 			swap(element_index, parent_index(element_index));
 			element_index = parent_index(element_index);
 		}
@@ -120,10 +115,10 @@ private:
 	{
 		while (2*element_index + 2 < heap_size_) {
 			auto new_index = 2*element_index + 1;
-			if (elements_[new_index+1].time() >  elements_[new_index].time())
+			if (elements_[new_index+1].time() <  elements_[new_index].time())
 				new_index++;
 
-			if(elements_[new_index].time() > elements_[element_index].time() ){
+			if(elements_[new_index].time() < elements_[element_index].time() ){
 				swap(new_index, element_index);
 				element_index = new_index;
 			}
