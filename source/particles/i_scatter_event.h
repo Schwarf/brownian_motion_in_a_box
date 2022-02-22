@@ -9,7 +9,7 @@ class IScatterEvent
 {
 public:
 	virtual bool is_still_valid() const = 0;
-	virtual bool does_happen_before(const IScatterEvent<T> &other_event) const = 0;
+	virtual bool does_happen_before(std::shared_ptr<IScatterEvent<T>> &other_event) const = 0;
 	virtual T time() const = 0;
 };
 

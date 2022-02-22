@@ -14,26 +14,30 @@ class ScatterEvent: public IScatterEvent<T>
 public:
 	ScatterEvent() = default;
 
-	ScatterEvent(T time_of_event, IParticle2DInABox<T> * particle_one, IParticle2DInABox<T> * particle_two)
+	ScatterEvent(T time_of_event,
+				 std::shared_ptr<IParticle2DInABox<T>> &particle_one,
+				 std::shared_ptr<IParticle2DInABox<T>> &particle_two)
 		:
 		time_of_event_(time_of_event),
 		particle_one_(particle_one),
 		particle_two_(particle_two)
 	{
-		collision_count_particle_one_ = particle_one_->number_of_collisions();
-		collision_count_particle_two_ = particle_two_->number_of_collisions();
+		if (particle_one_)
+			collision_count_particle_one_ = particle_one_->number_of_collisions();
+		if (particle_two_)
+			collision_count_particle_two_ = particle_two_->number_of_collisions();
 	}
 	bool is_still_valid() const final
 	{
-		if (collision_count_particle_one_ != particle_one_->number_of_collisions())
+		if (particle_one_ && (collision_count_particle_one_ != particle_one_->number_of_collisions()))
 			return false;
-		if (collision_count_particle_two_ != particle_two_->number_of_collisions())
+		if (particle_two_ && (collision_count_particle_two_ != particle_two_->number_of_collisions()))
 			return false;
 		return true;
 	}
-	bool does_happen_before(const IScatterEvent<T> &other_event) const final
+	bool does_happen_before(std::shared_ptr<IScatterEvent<T>> &other_event) const final
 	{
-		return time_of_event_ < other_event.time();
+		return time_of_event_ < other_event->time();
 	}
 	T time() const final
 	{
@@ -41,8 +45,8 @@ public:
 	}
 
 private:
-	IParticle2DInABox<T> * particle_one_{};
-	IParticle2DInABox<T>* particle_two_{};
+	std::shared_ptr<IParticle2DInABox<T>> particle_one_{};
+	std::shared_ptr<IParticle2DInABox<T>> particle_two_{};
 	T time_of_event_;
 	size_t collision_count_particle_one_{};
 	size_t collision_count_particle_two_{};

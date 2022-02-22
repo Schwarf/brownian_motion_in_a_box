@@ -44,9 +44,10 @@ public:
 		y_position_ += y_velocity_ * time_delta;
 	}
 
-	T time_to_scatter(IParticle2DInABox<T> &other_particle) const final
+	T time_to_scatter(std::shared_ptr<IParticle2DInABox<T>> & other_particle) const final
 	{
-		if (this->id() == other_particle.id())
+
+		if (this->id() == other_particle->id())
 			return T{-1};
 
 		auto delta_x = delta_x_(other_particle);
@@ -60,7 +61,7 @@ public:
 
 		auto velocity_delta_squared = delta_v_x * delta_v_x + delta_v_y * delta_v_y;
 		auto position_delta_squared = delta_x * delta_x + delta_y * delta_y;
-		auto radii_distance = this->radius_ + other_particle.radius();
+		auto radii_distance = this->radius_ + other_particle->radius();
 
 		auto
 			delta = (delta_position_times_delta_velocity * delta_position_times_delta_velocity) - velocity_delta_squared
@@ -93,24 +94,24 @@ public:
 		}
 		return T{-1};
 	}
-	void scatter(IParticle2DInABox<T> &other_particle) final
+	void scatter(std::shared_ptr<IParticle2DInABox<T>> & other_particle) final
 	{
 		auto delta_x = delta_x_(other_particle);
 		auto delta_y = delta_y_(other_particle);
 		auto delta_v_x = delta_v_x_(other_particle);
 		auto delta_v_y = delta_v_y_(other_particle);
 		auto delta_position_times_delta_velocity = delta_x * delta_v_x + delta_y * delta_v_y;
-		auto radii_distance = this->radius_ + other_particle.radius();
-		auto momentum = 2 * this->mass_ * other_particle.mass() * delta_position_times_delta_velocity
-			/ (this->mass_ + other_particle.mass()) / radii_distance;
+		auto radii_distance = this->radius_ + other_particle->radius();
+		auto momentum = 2 * this->mass_ * other_particle->mass() * delta_position_times_delta_velocity
+			/ (this->mass_ + other_particle->mass()) / radii_distance;
 
 		double x_momentum = momentum * delta_x / radii_distance;
 		double y_momentum = momentum * delta_y / radii_distance;
 		this->x_velocity_ += x_momentum / this->mass_;
 		this->y_velocity_ += y_momentum / this->mass_;
-		other_particle.set_x_velocity(other_particle.x_velocity() - x_momentum / other_particle.mass());
-		other_particle.set_y_velocity(other_particle.y_velocity() - y_momentum / other_particle.mass());
-		other_particle.increase_collision_counter();
+		other_particle->set_x_velocity(other_particle->x_velocity() - x_momentum / other_particle->mass());
+		other_particle->set_y_velocity(other_particle->y_velocity() - y_momentum / other_particle->mass());
+		other_particle->increase_collision_counter();
 		this->increase_collision_counter();
 	}
 	void scatter_vertical_wall() final
@@ -167,23 +168,24 @@ public:
 	{
 		number_of_collisions_++;
 	}
+	~Particle2DInABox() override = default;
 private:
-	T delta_x_(const IParticle2DInABox<T> &other_particle) const
+	T delta_x_(std::shared_ptr<IParticle2DInABox<T>> &other_particle) const
 	{
-		return other_particle.x_position() - this->x_position_;
+		return other_particle->x_position() - this->x_position_;
 	}
-	T delta_y_(const IParticle2DInABox<T> &other_particle) const
+	T delta_y_(std::shared_ptr<IParticle2DInABox<T>> &other_particle) const
 	{
-		return other_particle.y_position() - this->y_position_;
+		return other_particle->y_position() - this->y_position_;
 	}
 
-	T delta_v_x_(const IParticle2DInABox<T> &other_particle) const
+	T delta_v_x_(std::shared_ptr<IParticle2DInABox<T>> &other_particle) const
 	{
-		return other_particle.x_velocity() - this->x_velocity_;
+		return other_particle->x_velocity() - this->x_velocity_;
 	}
-	T delta_v_y_(const IParticle2DInABox<T> &other_particle) const
+	T delta_v_y_(std::shared_ptr<IParticle2DInABox<T>> &other_particle) const
 	{
-		return other_particle.y_velocity() - this->y_velocity_;
+		return other_particle->y_velocity() - this->y_velocity_;
 	}
 
 	size_t id_{};
