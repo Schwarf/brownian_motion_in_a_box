@@ -30,5 +30,5 @@ add_executable(sdl sdl_main.cpp)
 add_subdirectory(particles)
 include_directories(particles)
 # target_include_directories(particle_scattering )
-target_link_libraries(sdl SDL2main SDL2)
+target_link_libraries(sdl SDL2main SDL2 GL)
 
