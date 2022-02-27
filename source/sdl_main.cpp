@@ -5,11 +5,6 @@
 #include "sdl/SDL_wrapper.h"
 #include <string>
 
-void test()
-{
-	auto wrapper = SDL_Wrapper(600, 600);
-}
-
 
 int main()
 {
@@ -22,7 +17,8 @@ int main()
 	SDL_DestroyWindow(window);
 
 	 */
-	test();
-	SDL_Quit();
+	auto wrapper = SDL_Wrapper(600, 600);
+	SDL_Delay(1000);
+//	SDL_Quit();
 	return 0;
 }

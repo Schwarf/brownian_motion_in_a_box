@@ -18,7 +18,7 @@ private:
 	std::shared_ptr<SDL_Window> SDL_window_;
 	std::shared_ptr<SDL_Surface> SDL_surface_;
 	std::shared_ptr<void> GL_context_;
-
+	std::shared_ptr<SDL_Renderer> SDL_renderer_;
 };
 
 
