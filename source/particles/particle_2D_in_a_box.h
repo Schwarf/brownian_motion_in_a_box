@@ -197,7 +197,6 @@ private:
 	T radius_{};
 	T mass_{};
 	size_t number_of_collisions_{};
-
 };
 
 // Initialize particle counter.

@@ -26,6 +26,23 @@ public:
 		if (particle_two_)
 			collision_count_particle_two_ = particle_two_->number_of_collisions();
 	}
+	ScatterEvent(T time_of_event,
+				 std::shared_ptr<IParticle2DInABox<T>> particle_one)
+		:
+		time_of_event_(time_of_event),
+		particle_one_(particle_one)
+	{
+		if (particle_one_)
+			collision_count_particle_one_ = particle_one_->number_of_collisions();
+
+	}
+	explicit ScatterEvent(T time_of_event)
+		:
+		time_of_event_(time_of_event),
+		is_helper_event_(true)
+	{
+	}
+
 	bool is_still_valid() const final
 	{
 		if (particle_one_ && (collision_count_particle_one_ != particle_one_->number_of_collisions()))
@@ -50,13 +67,35 @@ public:
 	{
 		return particle_two_;
 	}
-
+	bool is_hitting_horizontal_wall() const override
+	{
+		return is_hitting_horizontal_wall_;
+	}
+	bool is_hitting_vertical_wall() const override
+	{
+		return is_hitting_vertical_wall_;
+	}
+	void set_is_hitting_horizontal_wall(bool is_hitting_horizontal_wall) override
+	{
+		is_hitting_horizontal_wall_ = is_hitting_horizontal_wall;
+	}
+	void set_is_hitting_vertical_wall(bool is_hitting_vertical_wall) override
+	{
+		is_hitting_vertical_wall_ = is_hitting_vertical_wall;
+	}
+	bool is_helper_event() const
+	{
+		return is_helper_event_;
+	}
 private:
 	std::shared_ptr<IParticle2DInABox<T>> particle_one_{};
 	std::shared_ptr<IParticle2DInABox<T>> particle_two_{};
 	T time_of_event_;
 	size_t collision_count_particle_one_{};
 	size_t collision_count_particle_two_{};
+	bool is_hitting_horizontal_wall_{};
+	bool is_hitting_vertical_wall_{};
+	bool is_helper_event_{};
 };
 
 #endif //SCATTER_EVENT_H

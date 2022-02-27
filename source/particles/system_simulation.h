@@ -26,7 +26,7 @@ public:
 			predict_scatter_times_for_(particle);
 		}
 
-		priority_queue_.insert( ScatterEvent<T>(simulation_time_limit_, nullptr, nullptr));
+		priority_queue_.insert( ScatterEvent<T>(0.0));
 
 		while(!priority_queue_.is_empty())
 		{
@@ -34,7 +34,7 @@ public:
 			if(!event.is_still_valid())
 				continue;
 			auto particle_one = event.particle_one();
-			auto particle_two = event.particle_two();
+
 
 			auto time_of_event = event.time();
 			for(auto & particle : list_of_particles_)
@@ -43,16 +43,21 @@ public:
 			}
 			simulation_time_ = time_of_event;
 
-			if(particle_one && particle_two)
-				particle_one->scatter(particle_two);
-			if(particle_one && !particle_two)
-				particle_one->scatter_vertical_wall();
-			if(!particle_one && particle_two)
-				particle_two->scatter_horizontal_wall();
-			if(!particle_one && !particle_two)
+
+			if(event.is_helper_event())
 				continue;
+
+			if(!event.is_hitting_horizontal_wall() && !event.is_hitting_vertical_wall()) {
+				auto particle_two = event.particle_two();
+				particle_one->scatter(particle_two);
+				predict_scatter_times_for_(particle_two);
+			}
+			if(event.is_hitting_vertical_wall())
+				particle_one->scatter_vertical_wall();
+			if(event.is_hitting_horizontal_wall())
+				particle_one->scatter_horizontal_wall();
+
 			predict_scatter_times_for_(particle_one);
-			predict_scatter_times_for_(particle_two);
 		}
 
 	}
@@ -88,12 +93,14 @@ private:
 		auto horizontal_wall_scatter_time = current_particle->time_to_scatter_horizontal_wall();
 		if (vertical_wall_scatter_time > 0.0 && (vertical_wall_scatter_time + simulation_time_) < simulation_time_limit_) {
 			auto scatter_event =
-				ScatterEvent<T>(vertical_wall_scatter_time + simulation_time_, nullptr, current_particle);
+				ScatterEvent<T>(vertical_wall_scatter_time + simulation_time_, current_particle);
+				scatter_event.set_is_hitting_vertical_wall(true);
 			priority_queue_.insert(scatter_event);
 		}
 		if (horizontal_wall_scatter_time > 0.0 && (horizontal_wall_scatter_time + simulation_time_) < simulation_time_limit_) {
 			auto scatter_event =
-				ScatterEvent<T>(horizontal_wall_scatter_time + simulation_time_, current_particle, nullptr);
+				ScatterEvent<T>(horizontal_wall_scatter_time + simulation_time_, current_particle);
+				scatter_event.set_is_hitting_horizontal_wall(true);
 			priority_queue_.insert(scatter_event);
 		}
 
