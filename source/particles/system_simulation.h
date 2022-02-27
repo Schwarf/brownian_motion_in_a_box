@@ -10,6 +10,11 @@
 #include "particle_2D_in_a_box.h"
 #include <vector>
 
+constexpr size_t compute_heap_capacity(size_t number_of_particles)
+{
+	return number_of_particles*(number_of_particles - 1)/2;
+}
+
 template<class T, size_t number_of_particles>
 class SystemSimulation: public ISystemSimulation<T>
 {
@@ -105,7 +110,7 @@ private:
 		}
 
 	}
-	BinaryHeap<ScatterEvent<T>, number_of_particles * (number_of_particles - 1) / 2> priority_queue_;
+	BinaryHeap<ScatterEvent<T>, compute_heap_capacity(number_of_particles)> priority_queue_;
 	std::vector<std::shared_ptr<IParticle2DInABox<T>>> list_of_particles_;
 	T simulation_time_{};
 	T simulation_time_limit_{};
