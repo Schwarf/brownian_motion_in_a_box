@@ -25,6 +25,10 @@ enable_cxx_compiler_flag_if_supported("-std=c++17")
 enable_cxx_compiler_flag_if_supported("-O0")
 
 
-add_executable(main main.cpp)
+add_executable(main main.cpp )
+add_executable(sdl sdl_main.cpp)
 add_subdirectory(particles)
 include_directories(particles)
+# target_include_directories(particle_scattering )
+target_link_libraries(sdl SDL2main SDL2)
+
